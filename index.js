@@ -1,7 +1,11 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const CHECKLIST_PATH = path.join(__dirname, "mission_challenges_checklist.txt");
+
 const metrics = {
   totalRequests: 0,
   totalResponseTimeMs: 0,
@@ -10,6 +14,21 @@ const metrics = {
 
 function toFixedNumber(value) {
   return Number(value.toFixed(2));
+}
+
+function escapeHtml(text) {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function readChecklistFile() {
+  try {
+    return fs.readFileSync(CHECKLIST_PATH, "utf8");
+  } catch (error) {
+    return "Checklist file not found. Add mission_challenges_checklist.txt in repo root.";
+  }
 }
 
 app.use((req, res, next) => {
@@ -106,7 +125,14 @@ app.get("/", (req, res) => {
   const host = req.get("host");
   const baseUrl = `${req.protocol}://${host}`;
   const repoUrl = "https://github.com/PalmChas/M4K-Pipeline";
+  const actionsUrl = "https://github.com/PalmChas/M4K-Pipeline/actions/workflows/pipeline.yml";
   const deployUrl = "https://m4k-pipeline-production.up.railway.app";
+  const checklistUrl = `${repoUrl}/blob/main/mission_challenges_checklist.txt`;
+  const checklistText = escapeHtml(readChecklistFile());
+  const averageResponseMs =
+    metrics.totalRequests === 0
+      ? 0
+      : toFixedNumber(metrics.totalResponseTimeMs / metrics.totalRequests);
 
   res.type("html").send(`
     <!doctype html>
@@ -118,74 +144,69 @@ app.get("/", (req, res) => {
         <style>
           :root {
             color-scheme: light;
+            --bg-a: #f7fbff;
+            --bg-b: #eef5ff;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --muted: #334155;
+            --line: #dbe7ff;
+            --accent: #1d4ed8;
+            --ok-bg: #dcfce7;
+            --ok-text: #166534;
+            --card-bg: #f8fbff;
+          }
+          * {
+            box-sizing: border-box;
           }
           body {
             margin: 0;
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(120deg, #f8fbff, #eef4ff);
-            color: #0f172a;
+            background: linear-gradient(120deg, var(--bg-a), var(--bg-b));
+            color: var(--text);
           }
           .wrap {
-            max-width: 980px;
-            margin: 36px auto;
-            padding: 24px;
-            background: #ffffff;
-            border: 1px solid #dbe4ff;
-            border-radius: 14px;
+            max-width: 1100px;
+            margin: 28px auto;
+            padding: 20px;
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 16px;
             box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
           }
           h1 {
-            margin-top: 0;
-            font-size: 1.9rem;
+            margin: 0 0 10px;
+            font-size: 2rem;
           }
-          .meta {
-            color: #334155;
-            margin-bottom: 20px;
+          h2 {
+            margin: 0 0 10px;
+            font-size: 1.15rem;
           }
-          .subtitle {
+          p {
             margin-top: 0;
-            margin-bottom: 18px;
-            color: #334155;
           }
           .ok {
             display: inline-block;
-            padding: 6px 10px;
+            margin-bottom: 12px;
+            padding: 6px 11px;
             border-radius: 999px;
-            background: #dcfce7;
-            color: #166534;
-            font-weight: 600;
-            margin-bottom: 16px;
+            background: var(--ok-bg);
+            color: var(--ok-text);
+            font-weight: 700;
+          }
+          .subtitle {
+            color: var(--muted);
+            margin-bottom: 18px;
           }
           .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
             gap: 12px;
           }
           .card {
-            border: 1px solid #dbe4ff;
+            border: 1px solid var(--line);
             border-radius: 12px;
             padding: 14px;
-            background: #f8faff;
-          }
-          .card h2 {
-            margin: 0 0 10px;
-            font-size: 1.1rem;
-          }
-          .list {
-            margin: 0;
-            padding-left: 18px;
-          }
-          .list li {
-            margin: 6px 0;
-          }
-          .checklist {
-            list-style: none;
-            padding-left: 0;
-            margin: 0;
-          }
-          .checklist li {
-            margin: 7px 0;
-            padding-left: 4px;
+            background: var(--card-bg);
           }
           .badge {
             display: inline-block;
@@ -196,80 +217,162 @@ app.get("/", (req, res) => {
             padding: 3px 8px;
             margin-bottom: 10px;
           }
-          .small {
-            color: #475569;
-            font-size: 0.92rem;
-          }
           ul {
-            padding-left: 20px;
+            margin: 0;
+            padding-left: 18px;
+          }
+          li {
+            margin: 6px 0;
           }
           a {
-            color: #1d4ed8;
+            color: var(--accent);
             text-decoration: none;
           }
           a:hover {
             text-decoration: underline;
           }
-          code {
-            background: #f1f5f9;
-            padding: 2px 6px;
-            border-radius: 6px;
+          .meta {
+            color: var(--muted);
+          }
+          .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+          }
+          .stat {
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+          }
+          .stat strong {
+            display: block;
+            font-size: 1.1rem;
+          }
+          .check {
+            margin-top: 10px;
+            list-style: none;
+            padding-left: 0;
+          }
+          .check li::before {
+            content: "[x] ";
+            color: #166534;
+            font-weight: 700;
+          }
+          .submit li::before {
+            content: "[ ] ";
+            color: #334155;
+            font-weight: 700;
+          }
+          pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #0b1220;
+            color: #dbeafe;
+            border-radius: 10px;
+            padding: 12px;
+            overflow-x: auto;
+            margin: 0;
+          }
+          .section {
+            margin-top: 12px;
+          }
+          .small {
+            font-size: 0.93rem;
+            color: #475569;
           }
         </style>
       </head>
       <body>
         <main class="wrap">
           <span class="ok">Pipeline app is running</span>
-          <h1>First Pipeline Challenge - Week 4</h1>
-          <p class="subtitle">Mission dashboard for challenge progress, endpoints and secrets.</p>
-          <p class="meta">Server time: <code>${now}</code></p>
+          <h1>First Pipeline Challenge - Mission Control</h1>
+          <p class="subtitle">Everything in one place: live status, endpoints, challenge requirements and submission checklist.</p>
 
           <section class="grid">
             <article class="card">
-              <span class="badge">Core Links</span>
-              <h2>Project</h2>
-              <ul class="list">
-                <li><a href="${repoUrl}" target="_blank" rel="noreferrer">GitHub Repository</a></li>
-                <li><a href="${deployUrl}" target="_blank" rel="noreferrer">Live Deployment</a></li>
-                <li><a href="${repoUrl}/blob/main/mission_challenges_checklist.txt" target="_blank" rel="noreferrer">Full Challenge Checklist</a></li>
+              <span class="badge">Project Links</span>
+              <h2>Core Links</h2>
+              <ul>
+                <li><a href="${repoUrl}" target="_blank" rel="noreferrer">GitHub repository</a></li>
+                <li><a href="${actionsUrl}" target="_blank" rel="noreferrer">GitHub Actions pipeline</a></li>
+                <li><a href="${deployUrl}" target="_blank" rel="noreferrer">Railway production URL</a></li>
+                <li><a href="${checklistUrl}" target="_blank" rel="noreferrer">Full challenge checklist file</a></li>
               </ul>
             </article>
 
             <article class="card">
-              <span class="badge">Verification Endpoints</span>
-              <h2>Health and Status</h2>
-              <ul class="list">
+              <span class="badge">Verification</span>
+              <h2>API Endpoints</h2>
+              <ul>
                 <li><a href="${baseUrl}/status">${baseUrl}/status</a></li>
                 <li><a href="${baseUrl}/health">${baseUrl}/health</a></li>
                 <li><a href="${baseUrl}/metrics">${baseUrl}/metrics</a></li>
-              </ul>
-            </article>
-
-            <article class="card">
-              <span class="badge">Secret Endpoints</span>
-              <h2>Bonus Challenges</h2>
-              <ul class="list">
                 <li><a href="${baseUrl}/secret">${baseUrl}/secret</a></li>
                 <li><a href="${baseUrl}/coffee">${baseUrl}/coffee</a></li>
               </ul>
             </article>
+
+            <article class="card">
+              <span class="badge">Live Service Stats</span>
+              <h2>Runtime Snapshot</h2>
+              <div class="status-grid">
+                <div class="stat"><strong>${Math.floor(process.uptime())}s</strong>Uptime</div>
+                <div class="stat"><strong>${metrics.totalRequests}</strong>Total Requests</div>
+                <div class="stat"><strong>${averageResponseMs} ms</strong>Avg Response</div>
+                <div class="stat"><strong>${now}</strong>Server Time (UTC)</div>
+              </div>
+            </article>
           </section>
 
-          <section class="card" style="margin-top: 12px;">
-            <span class="badge">Mission Progress</span>
-            <h2>Challenge Checklist Snapshot</h2>
-            <ul class="checklist">
-              <li>[x] Workflow runs on push and PR</li>
-              <li>[x] Automated tests in CI</li>
-              <li>[x] Docker build in CI</li>
-              <li>[x] Trivy security scan</li>
-              <li>[x] Live deployment on Railway</li>
-              <li>[x] CI badge in README</li>
-              <li>[x] Metrics endpoint with response tracking</li>
-              <li>[x] Secret challenge endpoints</li>
-              <li>[x] Pipeline ASCII art output</li>
+          <section class="card section">
+            <span class="badge">Challenge Progress</span>
+            <h2>Implemented</h2>
+            <ul class="check">
+              <li>GitHub Actions on push and PR</li>
+              <li>Automated tests in CI</li>
+              <li>Docker build in CI</li>
+              <li>Trivy scan with SARIF upload</li>
+              <li>Live deployment on Railway</li>
+              <li>Green CI badge in README</li>
+              <li>Health endpoint and metrics endpoint</li>
+              <li>Secret challenge endpoints and pipeline art</li>
+              <li>Slack notifications for success and failure with commit details</li>
             </ul>
-            <p class="small">Detailed checklist is tracked in <code>mission_challenges_checklist.txt</code>.</p>
+          </section>
+
+          <section class="grid section">
+            <article class="card">
+              <span class="badge">Submission</span>
+              <h2>Hand-in Checklist</h2>
+              <ul class="submit">
+                <li>Team name and members</li>
+                <li>GitHub repository URL</li>
+                <li>Deployed application URL</li>
+                <li>Screenshot of pipeline</li>
+                <li>Screenshot of deployed app</li>
+                <li>Optional: Trivy screenshot and architecture diagram</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <span class="badge">Quick Commands</span>
+              <h2>Final Verification</h2>
+              <pre>npm test
+docker build -t first-pipeline:latest .
+curl ${baseUrl}/status
+curl ${baseUrl}/health
+curl ${baseUrl}/metrics
+curl ${baseUrl}/secret</pre>
+              <p class="small">For local Trivy report: <code>trivy-report.txt</code>.</p>
+            </article>
+          </section>
+
+          <section class="card section">
+            <span class="badge">Full Mission File</span>
+            <h2>mission_challenges_checklist.txt</h2>
+            <pre>${checklistText}</pre>
           </section>
         </main>
       </body>
