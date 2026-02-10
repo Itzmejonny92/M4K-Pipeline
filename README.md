@@ -41,6 +41,7 @@ flowchart LR
 Team name: `M4K Gang`
 
 Members:
+- Oskar Palm
 - Carl Persson
 - Jonny Nguyen
 - Julia Persson
