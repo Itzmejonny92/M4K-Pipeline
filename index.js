@@ -111,6 +111,11 @@ app.get("/", (req, res) => {
             <li><a href="${baseUrl}/status">${baseUrl}/status</a></li>
             <li><a href="${baseUrl}/health">${baseUrl}/health</a></li>
           </ul>
+          <p>Bonus endpoints (Secret Challenges):</p>
+          <ul>
+            <li><a href="${baseUrl}/secret">${baseUrl}/secret</a></li>
+            <li><a href="${baseUrl}/coffee">${baseUrl}/coffee</a></li>
+          </ul>
         </main>
       </body>
     </html>
