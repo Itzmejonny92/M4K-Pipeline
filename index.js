@@ -2,6 +2,42 @@ const express = require("express");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const metrics = {
+  totalRequests: 0,
+  totalResponseTimeMs: 0,
+  routes: {}
+};
+
+function toFixedNumber(value) {
+  return Number(value.toFixed(2));
+}
+
+app.use((req, res, next) => {
+  const start = process.hrtime.bigint();
+
+  res.on("finish", () => {
+    const end = process.hrtime.bigint();
+    const durationMs = Number(end - start) / 1_000_000;
+    const route = req.path || "unknown";
+
+    metrics.totalRequests += 1;
+    metrics.totalResponseTimeMs += durationMs;
+
+    if (!metrics.routes[route]) {
+      metrics.routes[route] = {
+        requests: 0,
+        totalResponseTimeMs: 0,
+        lastStatusCode: 0
+      };
+    }
+
+    metrics.routes[route].requests += 1;
+    metrics.routes[route].totalResponseTimeMs += durationMs;
+    metrics.routes[route].lastStatusCode = res.statusCode;
+  });
+
+  next();
+});
 
 app.get("/status", (req, res) => {
   res.json({
@@ -15,6 +51,35 @@ app.get("/health", (req, res) => {
     service: "first-pipeline",
     healthy: true,
     uptimeSeconds: Math.floor(process.uptime())
+  });
+});
+
+app.get("/metrics", (req, res) => {
+  const averageResponseMs =
+    metrics.totalRequests === 0
+      ? 0
+      : toFixedNumber(metrics.totalResponseTimeMs / metrics.totalRequests);
+
+  const routeMetrics = {};
+  Object.keys(metrics.routes).forEach((route) => {
+    const routeData = metrics.routes[route];
+    const routeAverage =
+      routeData.requests === 0
+        ? 0
+        : toFixedNumber(routeData.totalResponseTimeMs / routeData.requests);
+
+    routeMetrics[route] = {
+      requests: routeData.requests,
+      averageResponseMs: routeAverage,
+      lastStatusCode: routeData.lastStatusCode
+    };
+  });
+
+  res.json({
+    uptimeSeconds: Math.floor(process.uptime()),
+    totalRequests: metrics.totalRequests,
+    averageResponseMs,
+    routeMetrics
   });
 });
 
@@ -176,6 +241,7 @@ app.get("/", (req, res) => {
               <ul class="list">
                 <li><a href="${baseUrl}/status">${baseUrl}/status</a></li>
                 <li><a href="${baseUrl}/health">${baseUrl}/health</a></li>
+                <li><a href="${baseUrl}/metrics">${baseUrl}/metrics</a></li>
               </ul>
             </article>
 
@@ -199,6 +265,7 @@ app.get("/", (req, res) => {
               <li>[x] Trivy security scan</li>
               <li>[x] Live deployment on Railway</li>
               <li>[x] CI badge in README</li>
+              <li>[x] Metrics endpoint with response tracking</li>
               <li>[x] Secret challenge endpoints</li>
               <li>[x] Pipeline ASCII art output</li>
             </ul>

@@ -32,6 +32,7 @@ flowchart LR
 - `GET /` -> dashboard landing page
 - `GET /status` -> service status + timestamp
 - `GET /health` -> health check + uptime
+- `GET /metrics` -> request count and average response time metrics
 
 ## Pipeline Demo GIF
 ![Pipeline Demo](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeWluNnN6dW5va2N1bDh1d2NubTRrMXh2Y2t6aW1wNnFhNXV0a2g4biZlcD12MV9naWZzX3NlYXJjaCZjdD1n/coxQHKASG60HrHtvkt/giphy.gif)
@@ -44,7 +45,7 @@ flowchart LR
 
 ## Future Plans
 - Add staging and production environments with protected deploys.
-- Add Prometheus-style `/metrics` and dashboard graphs.
+- Export metrics in Prometheus text format and add dashboard graphs.
 - Add Slack notifications for failed and successful runs.
 - Add chaos test job that randomly restarts the service in staging.
 
@@ -69,5 +70,6 @@ Misconfiguration found earlier:
 - All tests passing
 - Security scan complete
 - Deployed to production
+- `/metrics` endpoint implemented
 
 <!-- Careful readers only: try the hidden endpoint /secret -->
