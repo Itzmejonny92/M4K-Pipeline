@@ -3,12 +3,12 @@
 [![CI/CD Pipeline](https://github.com/PalmChas/M4K-Pipeline/actions/workflows/pipeline.yml/badge.svg)](https://github.com/PalmChas/M4K-Pipeline/actions/workflows/pipeline.yml)
 
 ```text
- __  __ _  _  _       ____  _            _ _            
-|  \/  | || || |     |  _ \(_)_ __   ___| (_)_ __   ___ 
+ __  __ _  _  _       ____  _            _ _
+|  \/  | || || |     |  _ \(_)_ __   ___| (_)_ __   ___
 | |\/| | || || |_    | |_) | | '_ \ / _ \ | | '_ \ / _ \
 | |  | |__   _|__|   |  __/| | |_) |  __/ | | | | |  __/
 |_|  |_|  |_|        |_|   |_| .__/ \___|_|_|_| |_|\___|
-                             |_|                         
+                             |_|
 ```
 
 Live deployment: [m4k-pipeline-production.up.railway.app](https://m4k-pipeline-production.up.railway.app)
@@ -37,11 +37,15 @@ flowchart LR
 ## Pipeline Demo GIF
 ![Pipeline Demo](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeWluNnN6dW5va2N1bDh1d2NubTRrMXh2Y2t6aW1wNnFhNXV0a2g4biZlcD12MV9naWZzX3NlYXJjaCZjdD1n/coxQHKASG60HrHtvkt/giphy.gif)
 
-## Team Bios
-- 👩‍💻 Driver: Builds app features and keeps commits clean.
-- 🧭 Navigator: Owns architecture, docs and delivery flow.
-- 🧪 Tester: Breaks assumptions and keeps pipeline green.
-- 🔍 Researcher: Investigates errors and optimizes tooling.
+## Team
+Team name: `M4K Gang`
+
+Members:
+- Oskar Palm
+- Carl Persson
+- Jonny Nguyen
+- Julia Persson
+- Mattej Petrovic
 
 ## Future Plans
 - Add staging and production environments with protected deploys.

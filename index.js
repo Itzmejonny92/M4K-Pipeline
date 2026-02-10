@@ -129,6 +129,15 @@ app.get("/", (req, res) => {
   const deployUrl = "https://m4k-pipeline-production.up.railway.app";
   const checklistUrl = `${repoUrl}/blob/main/mission_challenges_checklist.txt`;
   const checklistText = escapeHtml(readChecklistFile());
+  const teamName = "M4K Gang";
+  const teamMembers = [
+    "Oskar Palm",
+    "Carl Persson",
+    "Jonny Nguyen",
+    "Julia Persson",
+    "Mattej Petrovic"
+  ];
+  const teamMemberList = teamMembers.map((member) => `<li>${member}</li>`).join("");
   const averageResponseMs =
     metrics.totalRequests === 0
       ? 0
@@ -321,6 +330,14 @@ app.get("/", (req, res) => {
             </article>
 
             <article class="card">
+              <span class="badge">Team</span>
+              <h2>${teamName}</h2>
+              <ul>
+                ${teamMemberList}
+              </ul>
+            </article>
+
+            <article class="card">
               <span class="badge">Live Service Stats</span>
               <h2>Runtime Snapshot</h2>
               <div class="status-grid">
@@ -353,7 +370,7 @@ app.get("/", (req, res) => {
               <span class="badge">Submission</span>
               <h2>Hand-in Checklist</h2>
               <ul class="task-list">
-                <li><label class="task"><input type="checkbox" disabled />Team name and members</label></li>
+                <li><label class="task done"><input type="checkbox" checked disabled />Team name and members</label></li>
                 <li><label class="task done"><input type="checkbox" checked disabled />GitHub repository URL</label></li>
                 <li><label class="task done"><input type="checkbox" checked disabled />Deployed application URL</label></li>
                 <li><label class="task"><input type="checkbox" disabled />Screenshot of pipeline</label></li>
