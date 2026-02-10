@@ -31,6 +31,11 @@ function readChecklistFile() {
   }
 }
 
+function routeMetricName(route) {
+  const normalized = route.replaceAll("/", "_").replace(/[^a-zA-Z0-9_]/g, "_");
+  return normalized.length === 0 ? "root" : normalized;
+}
+
 app.use((req, res, next) => {
   const start = process.hrtime.bigint();
 
@@ -100,6 +105,46 @@ app.get("/metrics", (req, res) => {
     averageResponseMs,
     routeMetrics
   });
+});
+
+app.get("/metrics/prometheus", (req, res) => {
+  const averageResponseMs =
+    metrics.totalRequests === 0
+      ? 0
+      : toFixedNumber(metrics.totalResponseTimeMs / metrics.totalRequests);
+
+  const lines = [
+    "# HELP pipeline_total_requests Total HTTP requests handled by the service",
+    "# TYPE pipeline_total_requests counter",
+    `pipeline_total_requests ${metrics.totalRequests}`,
+    "# HELP pipeline_average_response_ms Average response time in milliseconds",
+    "# TYPE pipeline_average_response_ms gauge",
+    `pipeline_average_response_ms ${averageResponseMs}`,
+    "# HELP pipeline_uptime_seconds Service uptime in seconds",
+    "# TYPE pipeline_uptime_seconds gauge",
+    `pipeline_uptime_seconds ${Math.floor(process.uptime())}`
+  ];
+
+  Object.keys(metrics.routes).forEach((route) => {
+    const routeData = metrics.routes[route];
+    const routeAverage =
+      routeData.requests === 0
+        ? 0
+        : toFixedNumber(routeData.totalResponseTimeMs / routeData.requests);
+    const metricLabel = routeMetricName(route);
+
+    lines.push(`# HELP pipeline_route_requests_${metricLabel} Requests for route ${route}`);
+    lines.push(`# TYPE pipeline_route_requests_${metricLabel} counter`);
+    lines.push(`pipeline_route_requests_${metricLabel} ${routeData.requests}`);
+    lines.push(`# HELP pipeline_route_average_response_ms_${metricLabel} Average response time for route ${route}`);
+    lines.push(`# TYPE pipeline_route_average_response_ms_${metricLabel} gauge`);
+    lines.push(`pipeline_route_average_response_ms_${metricLabel} ${routeAverage}`);
+  });
+
+  res
+    .status(200)
+    .type("text/plain; version=0.0.4; charset=utf-8")
+    .send(`${lines.join("\n")}\n`);
 });
 
 app.get("/secret", (req, res) => {
@@ -324,6 +369,7 @@ app.get("/", (req, res) => {
                 <li><a href="${baseUrl}/status">${baseUrl}/status</a></li>
                 <li><a href="${baseUrl}/health">${baseUrl}/health</a></li>
                 <li><a href="${baseUrl}/metrics">${baseUrl}/metrics</a></li>
+                <li><a href="${baseUrl}/metrics/prometheus">${baseUrl}/metrics/prometheus</a></li>
                 <li><a href="${baseUrl}/secret">${baseUrl}/secret</a></li>
                 <li><a href="${baseUrl}/coffee">${baseUrl}/coffee</a></li>
               </ul>
@@ -360,8 +406,11 @@ app.get("/", (req, res) => {
               <li><label class="task done"><input type="checkbox" checked disabled />Live deployment on Railway</label></li>
               <li><label class="task done"><input type="checkbox" checked disabled />Green CI badge in README</label></li>
               <li><label class="task done"><input type="checkbox" checked disabled />Health endpoint and metrics endpoint</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Prometheus metrics export endpoint</label></li>
               <li><label class="task done"><input type="checkbox" checked disabled />Secret challenge endpoints and pipeline art</label></li>
               <li><label class="task done"><input type="checkbox" checked disabled />Slack notifications for success and failure with commit details</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Staging and production deploy workflow</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Chaos restart job for staging</label></li>
             </ul>
           </section>
 
@@ -387,6 +436,7 @@ docker build -t first-pipeline:latest .
 curl ${baseUrl}/status
 curl ${baseUrl}/health
 curl ${baseUrl}/metrics
+curl ${baseUrl}/metrics/prometheus
 curl ${baseUrl}/secret</pre>
               <p class="small">For local Trivy report: <code>trivy-report.txt</code>.</p>
             </article>

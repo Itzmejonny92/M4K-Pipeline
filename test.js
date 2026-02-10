@@ -63,8 +63,20 @@ async function run() {
       throw new Error("Metrics endpoint missing /status route metrics");
     }
 
+    const prometheusResponse = await requestPath("/metrics/prometheus");
+    if (prometheusResponse.statusCode !== 200) {
+      throw new Error(`Expected /metrics/prometheus HTTP 200, got ${prometheusResponse.statusCode}`);
+    }
+    if (!prometheusResponse.data.includes("pipeline_total_requests")) {
+      throw new Error("Prometheus metrics missing pipeline_total_requests");
+    }
+    if (!prometheusResponse.data.includes("pipeline_average_response_ms")) {
+      throw new Error("Prometheus metrics missing pipeline_average_response_ms");
+    }
+
     console.log("PASS: Status endpoint test passed");
     console.log("PASS: Metrics endpoint test passed");
+    console.log("PASS: Prometheus metrics endpoint test passed");
     server.close(() => process.exit(0));
   } catch (error) {
     console.error(`FAIL: Test failed: ${error.message}`);

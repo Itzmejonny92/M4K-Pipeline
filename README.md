@@ -54,11 +54,17 @@ Members:
 - 🧪 Julia Persson - Tester validating behavior and catching regressions early.
 - 🚀 Mattej Petrovic - DevOps finisher driving deployment and release polish.
 
+## Implemented Upgrades
+- Staging and production deployment jobs are configured in GitHub Actions.
+- Slack notifications are sent on successful deploy and pipeline failure.
+- Chaos restart job is enabled for staging deploy flow.
+- Prometheus-format metrics are available at `GET /metrics/prometheus`.
+
 ## Future Plans
-- Add staging and production environments with protected deploys.
-- Export metrics in Prometheus text format and add dashboard graphs.
-- Add Slack notifications for failed and successful runs.
-- Add chaos test job that randomly restarts the service in staging.
+- Add Grafana dashboard JSON and link screenshots for metrics.
+- Add release tags with automated changelog generation.
+- Add canary deploy strategy for production rollouts.
+- Add SLO error-budget tracking and alert thresholds.
 
 ## Trivy Findings (2026-02-10)
 Latest local scan report: `trivy-report.txt`
