@@ -48,6 +48,23 @@ flowchart LR
 - Add Slack notifications for failed and successful runs.
 - Add chaos test job that randomly restarts the service in staging.
 
+## Trivy Findings (2026-02-10)
+Latest local scan report: `trivy-report.txt`
+
+Summary:
+- OS packages (alpine): 32 total (CRITICAL: 2, HIGH: 4, MEDIUM: 21, LOW: 5)
+- Node.js packages: 7 total (CRITICAL: 0, HIGH: 5, MEDIUM: 0, LOW: 2)
+
+Key findings:
+- `libcrypto3` / `libssl3`: `CVE-2025-15467` (CRITICAL), fixed in `3.3.6-r0`
+- OpenSSL: `CVE-2025-69419` (HIGH)
+- `cross-spawn@7.0.3`: `CVE-2024-21538` (HIGH), fixed in `7.0.5`
+- `glob@10.4.2`: `CVE-2025-64756` (HIGH), fixed in `10.5.0` or `11.1.0`
+
+Misconfiguration found earlier:
+- `DS-0002`: container ran as root
+- Status: fixed by setting `USER node` in `Dockerfile`
+
 ## Status
 - All tests passing
 - Security scan complete
