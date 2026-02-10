@@ -250,20 +250,26 @@ app.get("/", (req, res) => {
             display: block;
             font-size: 1.1rem;
           }
-          .check {
+          .task-list {
             margin-top: 10px;
             list-style: none;
             padding-left: 0;
           }
-          .check li::before {
-            content: "[x] ";
-            color: #166534;
-            font-weight: 700;
+          .task-list li {
+            margin: 8px 0;
           }
-          .submit li::before {
-            content: "[ ] ";
-            color: #334155;
-            font-weight: 700;
+          .task {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          }
+          .task input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #166534;
+          }
+          .task.done {
+            color: #166534;
           }
           pre {
             white-space: pre-wrap;
@@ -329,16 +335,16 @@ app.get("/", (req, res) => {
           <section class="card section">
             <span class="badge">Challenge Progress</span>
             <h2>Implemented</h2>
-            <ul class="check">
-              <li>GitHub Actions on push and PR</li>
-              <li>Automated tests in CI</li>
-              <li>Docker build in CI</li>
-              <li>Trivy scan with SARIF upload</li>
-              <li>Live deployment on Railway</li>
-              <li>Green CI badge in README</li>
-              <li>Health endpoint and metrics endpoint</li>
-              <li>Secret challenge endpoints and pipeline art</li>
-              <li>Slack notifications for success and failure with commit details</li>
+            <ul class="task-list">
+              <li><label class="task done"><input type="checkbox" checked disabled />GitHub Actions on push and PR</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Automated tests in CI</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Docker build in CI</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Trivy scan with SARIF upload</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Live deployment on Railway</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Green CI badge in README</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Health endpoint and metrics endpoint</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Secret challenge endpoints and pipeline art</label></li>
+              <li><label class="task done"><input type="checkbox" checked disabled />Slack notifications for success and failure with commit details</label></li>
             </ul>
           </section>
 
@@ -346,13 +352,13 @@ app.get("/", (req, res) => {
             <article class="card">
               <span class="badge">Submission</span>
               <h2>Hand-in Checklist</h2>
-              <ul class="submit">
-                <li>Team name and members</li>
-                <li>GitHub repository URL</li>
-                <li>Deployed application URL</li>
-                <li>Screenshot of pipeline</li>
-                <li>Screenshot of deployed app</li>
-                <li>Optional: Trivy screenshot and architecture diagram</li>
+              <ul class="task-list">
+                <li><label class="task"><input type="checkbox" disabled />Team name and members</label></li>
+                <li><label class="task done"><input type="checkbox" checked disabled />GitHub repository URL</label></li>
+                <li><label class="task done"><input type="checkbox" checked disabled />Deployed application URL</label></li>
+                <li><label class="task"><input type="checkbox" disabled />Screenshot of pipeline</label></li>
+                <li><label class="task"><input type="checkbox" disabled />Screenshot of deployed app</label></li>
+                <li><label class="task"><input type="checkbox" disabled />Optional: Trivy screenshot and architecture diagram</label></li>
               </ul>
             </article>
 
