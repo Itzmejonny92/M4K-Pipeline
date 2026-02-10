@@ -47,6 +47,13 @@ Members:
 - Julia Persson
 - Mattej Petrovic
 
+### Team Bios
+- 🧭 Oskar Palm - Navigator who keeps architecture and direction aligned.
+- ⚙️ Carl Persson - Driver focused on implementation and delivery speed.
+- 🔍 Jonny Nguyen - Researcher who hunts fixes and improves workflow reliability.
+- 🧪 Julia Persson - Tester validating behavior and catching regressions early.
+- 🚀 Mattej Petrovic - DevOps finisher driving deployment and release polish.
+
 ## Future Plans
 - Add staging and production environments with protected deploys.
 - Export metrics in Prometheus text format and add dashboard graphs.
