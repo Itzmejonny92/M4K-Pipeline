@@ -14,25 +14,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: "📥 Checkout code"
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: "🟢 Setup Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: "npm"
 
-      - name: Install dependencies
+      - name: "📦 Install dependencies"
         run: npm ci
 
-      - name: Run tests
+      - name: "🧪 Run tests"
         run: npm test
 
-      - name: Build Docker image
+      - name: "🎨 Pipeline Art"
+        if: ${{ success() }}
+        run: |
+          echo "  ____  _            _ _            "
+          echo " |  _ \\(_)_ __   ___| (_)_ __   ___ "
+          echo " | |_) | | '_ \\ / _ \\ | | '_ \\ / _ \\"
+          echo " |  __/| | |_) |  __/ | | | | |  __/"
+          echo " |_|   |_| .__/ \\___|_|_|_| |_|\\___|"
+          echo "         |_|                         "
+          echo "Tests passed. Ready to deploy."
+
+      - name: "🐳 Build Docker image"
         run: docker build -t first-pipeline:${{ github.sha }} .
 
-      - name: Run Trivy vulnerability scanner
+      - name: "🔎 Run Trivy vulnerability scanner"
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: image
@@ -43,12 +54,12 @@ jobs:
           ignore-unfixed: true
           exit-code: "0"
 
-      - name: Upload Trivy scan results to GitHub Security tab
+      - name: "📤 Upload Trivy scan results to GitHub Security tab"
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: trivy-results.sarif
 
-      - name: Trigger Render deploy hook
+      - name: "🚀 Trigger Render deploy hook"
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && env.RENDER_DEPLOY_HOOK_URL != ''
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

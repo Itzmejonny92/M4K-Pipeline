@@ -18,6 +18,24 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.get("/secret", (req, res) => {
+  res.json({
+    message: "You found the secret! Here's a cookie.",
+    code: "OPERATION-PIPELINE"
+  });
+});
+
+app.get("/coffee", (req, res) => {
+  res.type("text/plain").send(`
+    ( (
+     ) )
+  ........
+  |      |]
+  \\      /
+   \`----'
+`);
+});
+
 app.get("/", (req, res) => {
   const now = new Date().toISOString();
   const host = req.get("host");
