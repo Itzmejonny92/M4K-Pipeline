@@ -4,6 +4,7 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const APP_VERSION = process.env.APP_VERSION || '1.0.0';
 const CHECKLIST_PATH = path.join(__dirname, "mission_challenges_checklist.txt");
 
 const metrics = {
@@ -74,6 +75,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({
     service: "first-pipeline",
     healthy: true,
+    version: APP_VERSION,
     uptimeSeconds: Math.floor(process.uptime())
   });
 });
@@ -390,6 +392,7 @@ app.get("/", (req, res) => {
                 <div class="stat"><strong>${Math.floor(process.uptime())}s</strong>Uptime</div>
                 <div class="stat"><strong>${metrics.totalRequests}</strong>Total Requests</div>
                 <div class="stat"><strong>${averageResponseMs} ms</strong>Avg Response</div>
+                <div class="stat"><strong>v${APP_VERSION}</strong>App Version</div>
                 <div class="stat"><strong>${now}</strong>Server Time (UTC)</div>
               </div>
             </article>
